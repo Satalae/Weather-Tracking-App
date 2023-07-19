@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Dashboard</title>
+    <link rel="stylesheet" href="./assets/css/jass.css" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+</head>
+
+<body>
+    <header>
+        <h1>Weather Dashboard</h1>
+    </header>
+
+    <div class="content">
+        <div class="sidebar">
+            <h2>Search for a City:</h2>
+            <input type="text" id="cityname" name="cityname">
+            <button class="search-button">Search</button>
+
+            <ul class="favorite-container">
+                
+            </ul>
+            <button class="reset-button">Reset Recents</button>
+        </div>
+
+        <main>
+            <div class="display">
+                <h3>City Name</h3>
+                <p>Temp: <span id="temp-display"></span></p>
+                <p>Wind: <span id="wind-display"></span></p>
+                <p>Humidity: <span id="humidity-display"></span></p>
+            </div>
+
+            <h4>5-Day Forecast</h4>
+            <div class="chart">
+
+            </div>
+        </main>
+    </div>
+<script src="./assets/js/script.js"></script>
+</body>
+</html> 
