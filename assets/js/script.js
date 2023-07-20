@@ -115,6 +115,7 @@ function createCards() {
 
 // Simply re-renders recents when called
 function renderRecents() {
+    console.log(recents);
     recentsPulled = JSON.parse(localStorage.getItem('recent-searches'));
     recents = recentsPulled;
 
