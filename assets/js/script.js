@@ -192,8 +192,8 @@ function createCoords(input) {
         alert('Please enter in a city, followed by a state. \n Example: "Creswell, OR"');
         return;
     }else{
-        getLonLat("http://api.openweathermap.org/geo/1.0/direct?q=" + inputCity + "," + inputState + ",US&appid=a39b53f09dc5424eec6bd8285d58ffe7");
-        searchAPI("http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&exclude=minutely,hourly,alerts&units=imperial&appid=a39b53f09dc5424eec6bd8285d58ffe7");
+        getLonLat("https://api.openweathermap.org/geo/1.0/direct?q=" + inputCity + "," + inputState + ",US&appid=a39b53f09dc5424eec6bd8285d58ffe7");
+        searchAPI("https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&exclude=minutely,hourly,alerts&units=imperial&appid=a39b53f09dc5424eec6bd8285d58ffe7");
         addRecent(input);
     }
 }
