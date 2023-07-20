@@ -26,7 +26,6 @@ const searchAPI = (requestURL) => {
             return response.json();
         })
         .then((data) => {
-            console.log(data);
             for(let i = 0; i <= 5; i++){
                 iter = i * 8;
                 if(iter == 40){
@@ -147,22 +146,29 @@ function renderRecents() {
 
 // Adds to recent list, stores in local storage
 function addRecent(input) {
-    // Checks if input is already in recents
-    for(let i = 0; i < recents.length; i++){
-        if(input == recents[i]){
-            return;
+    // If there is null recents in storage, it will throw an error
+    // When checking for length. If null, just add it in.
+    if(recents !== null){
+        // Checks if input is already in recents
+        for(let i = 0; i < recents.length; i++){
+            if(input == recents[i]){
+                return;
+            }
         }
-    }
+    
 
-    // Push the input to the favorites array to be locally stored
-    // If it is full (5 Recents), dequeue earliest
-    if(recents.length < 4){
-        recents.push(input);
-        console.log("The recents is not full yet, pushed input");
-        localStorage.setItem("recent-searches", JSON.stringify(recents));
+        // Push the input to the favorites array to be locally stored
+        // If it is full (5 Recents), dequeue earliest
+        if(recents.length < 4){
+            recents.push(input);
+            localStorage.setItem("recent-searches", JSON.stringify(recents));
+        }else{
+            recents.push(input);
+            recents.shift();
+            localStorage.setItem("recent-searches", JSON.stringify(recents));
+        }
     }else{
         recents.push(input);
-        recents.shift();
         localStorage.setItem("recent-searches", JSON.stringify(recents));
     }
 
@@ -201,7 +207,6 @@ function createCoords(input) {
 // Listener for Search Button
 searchButton.addEventListener("click", function(){
     inputResult = document.getElementById('cityname').value;
-    console.log(inputResult);
     createCoords(inputResult);
 });
 
