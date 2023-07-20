@@ -2,16 +2,22 @@
 var searchButton = document.querySelector(".search-button");
 var resetButton = document.querySelector('.reset-button');
 var historyList = document.querySelector(".favorite-container");
+var cityTitle = document.querySelector("#select-city");
+var tempDisplay = document.querySelector("#temp-display");
+var windDisplay = document.querySelector("#wind-display");
+var humDisplay = document.querySelector("#humidity-display");
 var cardList = document.querySelector(".chart");
 
 // Global Variables
 var lon = "0";
 var lat = "0";
-var temp;
-var wind;
-var humidity;
+var temp = [];
+var wind = [];
+var humidity = [];
 var recents = [];
 
+// Date/Formatting
+var date = new Date().toLocaleDateString('en-us', { month: "long", day: "numeric", year: "numeric" });
 
 // Functions for fetching lat/lon and weather information
 const searchAPI = (requestURL) => {
@@ -20,8 +26,19 @@ const searchAPI = (requestURL) => {
             return response.json();
         })
         .then((data) => {
-            console.log("fetch Retrieved");
             console.log(data);
+            for(let i = 0; i <= 5; i++){
+                iter = i * 8;
+                if(iter == 40){
+                    iter = iter - 1;
+                }
+                temp.push(data.list[iter].main.temp);
+                wind.push(data.list[iter].wind.speed);
+                humidity.push(data.list[iter].main.humidity);
+            }
+        })
+        .then(() =>{
+            createCards();
         })
 }
 
@@ -31,44 +48,69 @@ const getLonLat = (requestURL) => {
             return response.json();
         })
         .then(function (data) {
-            console.log(data);
             lat = data[0].lat;
             lon = data[0].lon;
         })
 }
 
 // Creates day card
-function createCard() {
+function createCards() {
     // Generate 5 day forecast cards
-    for(var i = 0; i <= 4; i++){
-        card = document.createElement('div');
-        card.setAttribute('id', 'card');
+    for(var i = 0; i <= 5; i++){
+        tempGiven = temp[i] + "f \n";
+        windGiven = wind[i] + " MPH \n";
+        humGiven = humidity[i] + "% \n";
 
-        cardHeader = document.createElement('h5');
+        // This is for the main display
+        if(i == 0){
+            tempDisplay.textContent = tempGiven
+            windDisplay.textContent = windGiven;
+            humDisplay.textContent = humGiven;
+        }else{
+            // Creates all the elements
+            var genDate = new Date()
+            genDate.setDate(genDate.getDate() + i);
+            genDate = genDate.toLocaleDateString('en-us', { month: "long", day: "numeric", year: "numeric" });
 
-        cardTable = document.createElement('table');
-        // Switches based on day
-        switch(i){
-            case 0:
+            card = document.createElement('div');
+            card.setAttribute('id', 'card');
 
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
+            cardHeader = document.createElement('h5');
+            cardHeader.textContent = genDate;
+
+            cardTable = document.createElement('table');
+
+            tempRow = document.createElement('tr');
+            windRow = document.createElement('tr');
+            humidityRow = document.createElement('tr');
+
+            tempData = document.createElement('tr');
+            windData = document.createElement('tr');
+            humidityData = document.createElement('tr');
+
+            tempData.setAttribute('id', 'table-row');
+            windData.setAttribute('id', 'table-row');
+            humidityData.setAttribute('id', 'table-row');
+            
+            // Populates the elements
+            tempData.textContent = "Tempurature is: " + tempGiven;
+            windData.textContent = "Wind Speed is: " + windGiven;
+            humidityData.textContent = "Humidity is: " + humGiven;
+
+            // Assembles and appends the card
+            tempRow.appendChild(tempData);
+            windRow.appendChild(windData);
+            humidityRow.appendChild(humidityData);
+
+            cardTable.appendChild(cardHeader);
+            cardTable.appendChild(tempRow);
+            cardTable.appendChild(windRow);
+            cardTable.appendChild(humidityRow);
+
+            card.appendChild(cardTable);
+            
+            cardList.appendChild(card);
         }
-
-        cardRow = document.createElement('tr');
-
-        tempData = document.createElement('td');
-        windData = document.createElement('td');
-        humidityData = document.createElement('td');
-
-
     }
 }
 
@@ -129,21 +171,14 @@ function addRecent(input) {
 
 // Function to retrieve input and call fetch functions
 function createCoords(input) {
-    inputCity = input.split(",")[0];
-    console.log("The input city is: " + inputCity);
-    inputState = input.split(", ")[1]
-    console.log("The input state is: " + inputState);
-    console.log("http://api.openweathermap.org/geo/1.0/direct?q=" + inputCity + "," + inputState + ",US&appid=a39b53f09dc5424eec6bd8285d58ffe7");
+    // Dump previous stats for next set
+    temp = [];
+    wind = [];
+    humidity = [];
 
-    if(inputCity == null || inputState == null){
-        // Tell user to input right, then leave function early
-        alert('Please enter in a city, followed by a state. \n Example: "Creswell, OR"');
-        return;
-    }else{
-        getLonLat("http://api.openweathermap.org/geo/1.0/direct?q=" + inputCity + "," + inputState + ",US&appid=a39b53f09dc5424eec6bd8285d58ffe7");
-        searchAPI("http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=a39b53f09dc5424eec6bd8285d58ffe7");
-        addRecent(input);
-    }
+    inputCity = input.split(",")[0];
+    inputState = input.split(", ")[1]
+    cityTitle.textContent = inputCity + " " + date;
 
     // IF data is present, get rid of it, otherwise place new cards
     if(cardList.firstChild){
@@ -152,7 +187,15 @@ function createCoords(input) {
         }
     }
 
-    //createCards();
+    if(inputCity == null || inputState == null){
+        // Tell user to input right, then leave function early
+        alert('Please enter in a city, followed by a state. \n Example: "Creswell, OR"');
+        return;
+    }else{
+        getLonLat("http://api.openweathermap.org/geo/1.0/direct?q=" + inputCity + "," + inputState + ",US&appid=a39b53f09dc5424eec6bd8285d58ffe7");
+        searchAPI("http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&exclude=minutely,hourly,alerts&units=imperial&appid=a39b53f09dc5424eec6bd8285d58ffe7");
+        addRecent(input);
+    }
 }
 
 // Listener for Search Button
@@ -168,15 +211,5 @@ resetButton.addEventListener("click", function(){
     renderRecents();
 });
 
+// Loads recent list from memory
 renderRecents();
-
-//5 Day Weather API
-//http://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid=a39b53f09dc5424eec6bd8285d58ffe7
-
-//Geocoding API
-//http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&appid=a39b53f09dc5424eec6bd8285d58ffe7
-
-//Example of what needs to be made.
-//http://api.openweathermap.org/geo/1.0/direct?q=Creswell,Oregon,US&appid=a39b53f09dc5424eec6bd8285d58ffe7
-//Then
-//http://api.openweathermap.org/data/2.5/forecast?lat=43.9179023&lon=-123.0245261&appid=a39b53f09dc5424eec6bd8285d58ffe7
